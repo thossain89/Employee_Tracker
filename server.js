@@ -106,12 +106,26 @@ const start = async () => {
 const employeeView = async () => {
   console.log(chalk.yellow("****||View Employee||****"));
   try {
-    let query = "SELECT * FROM employee";
+    let query = `SELECT 
+    employee.id,
+    employee.first_name, 
+    employee.last_name,
+    employee.manager_id AS employee_id_of_manager,
+    role.department_id,
+    department.department_name,
+    role.title, 
+    role.id,
+    role.salary
+    FROM role
+    LEFT JOIN employee
+    ON role.id = employee.role_id
+    LEFT JOIN department
+    ON department.id = role.department_id
+    WHERE employee.id IS NOT NULL`;
+;
     connection.query(query, function (err, res) {
       if (err) throw err;
-      let employeeArray = [];
-      res.forEach((employee) => employeeArray.push(employee));
-      console.table(employeeArray);
+      console.table(res);
       start();
     });
   } catch (err) {
@@ -128,9 +142,7 @@ const departmentView = async () => {
     let query = "SELECT * FROM department";
     connection.query(query, function (err, res) {
       if (err) throw err;
-      let departmentArray = [];
-      res.forEach((department) => departmentArray.push(department));
-      console.table(departmentArray);
+      console.table(res);
       start();
     });
   } catch (err) {
@@ -144,12 +156,14 @@ const departmentView = async () => {
 const roleView = async () => {
     console.log(chalk.yellow("****||View Role||****"));
   try {
-    let query = "SELECT * FROM role";
+    let query = `SELECT department.department_name, department.id, role.title, role.id, role.salary
+    FROM department
+    LEFT JOIN role
+    ON department.id = role.department_id
+    WHERE role.id IS NOT NULL`;
     connection.query(query, function (err, res) {
       if (err) throw err;
-      let roleArray = [];
-      res.forEach((role) => roleArray.push(role));
-      console.table(roleArray);
+      console.table(res);
       start();
     });
   } catch (err) {
